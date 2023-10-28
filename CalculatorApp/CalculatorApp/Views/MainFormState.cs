@@ -8,15 +8,9 @@ namespace CalculatorApp.Views
         private bool _buttonEnabled = true;
         private string _results;
         private string _history;
-        private string _error;
 
         public MainFormState()
         {
-        }
-
-        public MainFormState(bool buttonEnabled)
-        {
-            _buttonEnabled = buttonEnabled;
         }
 
         [Bindable(true)]
@@ -59,21 +53,6 @@ namespace CalculatorApp.Views
                 {
                     OnPropertyChanging();
                     _history = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        [Bindable(true)]
-        public string Error
-        {
-            get => _error;
-            set
-            {
-                if (_error != value)
-                {
-                    OnPropertyChanging();
-                    _error = value;
                     OnPropertyChanged();
                 }
             }

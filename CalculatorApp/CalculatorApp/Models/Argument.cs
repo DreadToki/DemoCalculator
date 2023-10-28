@@ -2,19 +2,24 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 
 namespace CalculatorApp.Models
 {
-    internal class Argument : LinkedList<char>, IBufferItem
+    internal class Argument : IBufferItem
     {
+        private readonly LinkedList<char> _value;
+
         public Argument(params char[] value)
         {
+            _value = new LinkedList<char>();
+
             if (value != null)
             {
                 foreach (char c in value)
                 {
-                    base.AddLast(c);
+                    _value.AddLast(c);
                 }
             }
         }
@@ -22,7 +27,7 @@ namespace CalculatorApp.Models
         public override string ToString()
         {
             StringBuilder buffer = new StringBuilder();
-            ConcatNodes(buffer, base.First);
+            ConcatNodes(buffer, _value.First);
             return buffer.ToString();
         }
 
@@ -46,18 +51,35 @@ namespace CalculatorApp.Models
             throw new ArgumentException($"Unable to convert {number} to decimal.");
         }
 
-        public void AddLastDigit(char value)
+        public void Append(Argument argument)
         {
-            base.AddLast(value);
-        }
-
-        public void RemoveLastDigit()
-        {
-            if (base.Count > 0)
+            if (argument._value.Count == 0)
             {
-                base.RemoveLast();
+                throw new ArgumentException("Argument is empty.");
+            }
+            if (argument._value.Count == 1)
+            {
+                _value.AddLast(argument);
+            }
+            else
+            {
+                var chars = argument._value.ToArray();
+                for (int i = 0; i < chars.Length; i++)
+                {
+                    _value.AddLast(chars[i]);
+                }
             }
         }
+
+        public void RemoveLast()
+        {
+            if (_value.Count > 0)
+            {
+                _value.RemoveLast();
+            }
+        }
+
+        public bool IsEmpty => _value.Count == 0;
 
         public static implicit operator Argument(char value)
         {
@@ -75,23 +97,23 @@ namespace CalculatorApp.Models
             return arg;
         }
 
-        public static implicit operator char(Argument value)
+        public static implicit operator char(Argument argument)
         {
-            if (value.Last == null)
+            if (argument._value.Last == null)
             {
                 throw new ArgumentNullException("value");
             }
-            return value.Last.Value;
+            return argument._value.Last.Value;
         }
 
-        public static implicit operator string(Argument value)
+        public static implicit operator string(Argument argument)
         {
-            return value.ToString();
+            return argument.ToString();
         }
 
-        public static implicit operator decimal(Argument value)
+        public static implicit operator decimal(Argument argument)
         {
-            return value.ToDecimal();
+            return argument.ToDecimal();
         }
 
         public static Argument _0 => '0';

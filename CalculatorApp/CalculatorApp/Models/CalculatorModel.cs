@@ -5,23 +5,27 @@ namespace CalculatorApp.Models
 {
     internal class CalculatorModel : NotifyPropertyChanges, ICalculatorModel
     {
-        private readonly LinkedList<IBufferItem> buffer;
+        private readonly LinkedList<IBufferItem> _buffer;
 
         public CalculatorModel()
         {
-            buffer = new LinkedList<IBufferItem>();
+            _buffer = new LinkedList<IBufferItem>();
         }
+
+        public LinkedListNode<IBufferItem> First => _buffer.First;
+
+        public LinkedListNode<IBufferItem> Last => _buffer.Last;
 
         public void AddArgument(Argument argument)
         {
             OnPropertyChanging();
-            if (buffer.Last?.Value is Argument lastArgument)
+            if (_buffer.Last?.Value is Argument lastArgument)
             {
                 lastArgument.Append(argument);
             }
             else
             {
-                buffer.AddLast(argument);
+                _buffer.AddLast(argument);
             }
             OnPropertyChanged();
         }
@@ -29,44 +33,53 @@ namespace CalculatorApp.Models
         public void AddOperation(ICommand command)
         {
             OnPropertyChanging();
-            if (buffer.Last?.Value is ICommand)
+            if (_buffer.Last?.Value is ICommand)
             {
                 return;
             }
-            buffer.AddLast(command);
+            _buffer.AddLast(command);
             OnPropertyChanged();
         }
 
         public void AddResult(CalculationResult result)
         {
             OnPropertyChanging();
-            buffer.AddLast(result);
+            _buffer.AddLast(result);
             OnPropertyChanged();
         }
 
         public void Clear()
         {
             OnPropertyChanging();
-            buffer.Clear();
+            _buffer.Clear();
+            HasError = false;
             OnPropertyChanged();
         }
 
         public void RemoveLast()
         {
             OnPropertyChanging();
-            if (buffer.Last?.Value is Argument argument)
+            if (_buffer.Last?.Value is Argument argument)
             {
                 argument.RemoveLast();
-                if (argument.Count == 0)
+                if (argument.IsEmpty)
                 {
-                    buffer.RemoveLast();
+                    RemoveLastItem();
                 }
             }
             else
             {
-                buffer.RemoveLast();
+                RemoveLastItem();
             }
             OnPropertyChanged();
+        }
+
+        private void RemoveLastItem()
+        {
+            if (_buffer.Count > 0)
+            {
+                _buffer.RemoveLast();
+            }
         }
     }
 }

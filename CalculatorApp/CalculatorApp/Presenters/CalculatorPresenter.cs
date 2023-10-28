@@ -2,16 +2,19 @@
 using CalculatorApp.Models;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 
 namespace CalculatorApp.Presenter
 {
     internal class CalculatorPresenter
     {
-        private readonly ICalculatorModel _view;
-        private readonly CalculatorModel _model;
+        private const string NewLine = "\r\n";
+        private const string Whitespace = " ";
 
-        public CalculatorPresenter(ICalculatorModel view, CalculatorModel model)
+        private readonly ICalculatorView _view;
+        private readonly ICalculatorModel _model;
+
+        public CalculatorPresenter(ICalculatorView view, ICalculatorModel model)
         {
             _view = view;
             _model = model;
@@ -36,12 +39,15 @@ namespace CalculatorApp.Presenter
 
         private void _view_ClearLastCommandInvoked(object sender, EventArgs e)
         {
-            if (_model.Last?.Value is Argument)
+            if (_model.HasError)
             {
-                _model.RemoveFromArgument();
-                return;
+                _model.RemoveLastArgument();
+                _model.HasError = false;
             }
-            _model.RemoveLast();
+            else
+            {
+                _model.RemoveLast();
+            }
         }
 
         private void _view_ClearEverythingCommandInvoked(object sender, EventArgs e)
@@ -56,64 +62,22 @@ namespace CalculatorApp.Presenter
 
         private void _view_CommandInvoked(object sender, CommandInvokedEventArgs e)
         {
-            if (e.Item is ICommand command && _model.Last?.Value is Argument)
+            if (e.BufferItem is Argument argument)
             {
-                Calculate();
-                _model.AddLast(command);
-                return;
+                _model.AddArgument(argument);
             }
-            if (e.Item is Argument arg)
+            else if (e.BufferItem is ICommand command)
             {
-                if (_model.Last?.Value == null || _model.Last?.Value is ICommand)
-                {
-                    _model.AddLast(arg);
-                    return;
-                }
                 if (_model.Last?.Value is Argument)
                 {
-                    _model.AddToArgument(arg);
-                    return;
-                }
-                if (_model.Last?.Value is CalculationResult)
-                {
-                    _model.AddLast(arg);
+                    _model.AddOperation(command);
                 }
             }
         }
 
         private void _model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            StringBuilder buffer = new StringBuilder();
-            ConcatNodes(buffer, _model.First);
-            _view.Update(buffer.ToString());
-        }
-
-        private void ConcatNodes(StringBuilder buffer, LinkedListNode<IBufferItem> node)
-        {
-            if (node == null)
-            {
-                return;
-            }
-
-            var nextExists = node.Next != null;
-
-            var newline = nextExists
-                ? "\r\n"
-                : string.Empty;
-
-            var space = nextExists
-                ? " "
-                : string.Empty;
-
-            if (node.Value is CalculationResult)
-            {
-                buffer.Append($"{node.Value.ToString()}{newline}");
-            }
-            else
-            {
-                buffer.Append($"{node.Value.ToString()}{space}");
-            }
-            ConcatNodes(buffer, node.Next);
+            UpdateView();
         }
 
         private void Calculate()
@@ -124,17 +88,63 @@ namespace CalculatorApp.Presenter
                     _model.Last?.Previous?.Value is ICommand command &&
                     _model.Last?.Previous?.Previous?.Value is Argument arg1)
                 {
-                    var result = command.Execute(arg1, arg2);
-                    var calculationResult = new CalculationResult($"= {result}");
-                    _model.AddLast(calculationResult);
-                    Argument arg = result;
-                    _model.AddLast(arg);
+                    CalculationResult result = command.Execute(arg1, arg2);
+                    _model.AddResult(result);
+                    _model.AddArgument(result);
                 }
             }
             catch (Exception ex)
             {
-                _view.DisplayError(ex.Message);
+                _model.HasError = true;
+                _view.UpdateError(ex.Message);
             }
+        }
+
+        private void UpdateView()
+        {
+            List<string> buffer = new List<string>();
+            ForwardConcatNodes(buffer, _model.First);
+            if (buffer.Count > 0)
+            {
+                var history = string.Join(NewLine, buffer.Take(buffer.Count - 1));
+                var results = buffer.Last();
+                _view.UpdateHistory(history);
+                _view.UpdateResults(results);
+            }
+            else
+            {
+                _view.UpdateHistory(string.Empty);
+                _view.UpdateResults(string.Empty);
+            }
+        }
+
+        private void ForwardConcatNodes(List<string> buffer, LinkedListNode<IBufferItem> node)
+        {
+            if (node == null)
+            {
+                return;
+            }
+
+            var space = node.Next != null
+                ? Whitespace
+                : string.Empty;
+
+            if (buffer.Count > 0 && node.Value is CalculationResult)
+            {
+                var last = buffer.Last() + $"{node.Value.ToString()}";
+                buffer[buffer.Count - 1] = last;
+                buffer.Add(string.Empty);
+            }
+            else if (buffer.Count == 0)
+            {
+                buffer.Add($"{node.Value.ToString()}{space}");
+            }
+            else
+            {
+                var last = buffer.Last() + $"{node.Value.ToString()}{space}";
+                buffer[buffer.Count - 1] = last;
+            }
+            ForwardConcatNodes(buffer, node.Next);
         }
     }
 }

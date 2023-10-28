@@ -18,7 +18,7 @@ namespace CalculatorApp.Views
 
             _state = new MainFormState();
 
-            mainFormBindingSource.DataSource = _state;
+            mainFormStateBindingSource.DataSource = _state;
         }
 
         #region MainForm component events
@@ -113,13 +113,18 @@ namespace CalculatorApp.Views
             OnClearLastCommandInvoked();
         }
 
-        private void txtResult_TextChanged(object sender, EventArgs e)
+        private void txtHistory_TextChanged(object sender, EventArgs e)
         {
             if (sender is TextBox txtBox)
             {
                 txtBox.SelectionStart = txtBox.TextLength;
                 txtBox.ScrollToCaret();
             }
+        }
+
+        private void msiFile_Exit_Click(object sender, EventArgs e)
+        {
+            Close();
         }
 
         #endregion
@@ -156,6 +161,7 @@ namespace CalculatorApp.Views
 
         public void UpdateResults(string results)
         {
+            _state.ButtonEnabled = true;
             _state.Results = results;
         }
 
@@ -166,9 +172,38 @@ namespace CalculatorApp.Views
 
         public void UpdateError(string errorMessage)
         {
-            _state.Error = errorMessage;
+            _state.ButtonEnabled = false;
+            _state.Results = errorMessage;
         }
 
         #endregion
+
+        private void MainForm_Load(object sender, EventArgs e)
+        {
+            KeyPreview = true;
+        }
+
+        private void MainForm_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.KeyCode)
+            {
+                case Keys.Escape:
+                    btnCE.Select();
+                    btnCE.PerformClick();
+                    break;
+                case Keys.D0:
+                case Keys.NumPad0:
+                    btn0.Select();
+                    btn0.PerformClick();
+                    break;
+                case Keys.D1:
+                    btn1.Select();
+                    btn1.PerformClick();
+                    break;
+                default:
+                    break;
+            }
+            e.Handled = true;
+        }
     }
 }
