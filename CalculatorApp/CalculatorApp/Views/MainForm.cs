@@ -1,6 +1,8 @@
 ﻿using CalculatorApp.Interface;
-using CalculatorApp.Models;
 using System;
+using System.Drawing;
+using System.Drawing.Text;
+using System.IO;
 using System.Windows.Forms;
 
 using static CalculatorApp.Commands.Commands;
@@ -8,74 +10,106 @@ using static CalculatorApp.Models.Argument;
 
 namespace CalculatorApp.Views
 {
-    internal partial class MainForm : Form, ICalculatorView
+    internal partial class MainForm : Form, IMainView
     {
-        private readonly MainFormState _state;
+        private readonly PrivateFontCollection _privateFontCollection;
+        private readonly MainViewState _state;
 
         public MainForm()
         {
             InitializeComponent();
 
-            _state = new MainFormState();
+            _privateFontCollection = new PrivateFontCollection();
+            _state = new MainViewState();
 
             mainFormStateBindingSource.DataSource = _state;
         }
 
         #region MainForm component events
 
+        private void MainForm_Load(object sender, EventArgs e)
+        {
+            KeyPreview = true;
+
+            LoadPrivateFonts();
+        }
+
+        private void MainForm_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.KeyCode)
+            {
+                case Keys.Escape:
+                    btnCE.Select();
+                    btnCE.PerformClick();
+                    break;
+                case Keys.D0:
+                case Keys.NumPad0:
+                    btn0.Select();
+                    btn0.PerformClick();
+                    break;
+                case Keys.D1:
+                    btn1.Select();
+                    btn1.PerformClick();
+                    break;
+                default:
+                    break;
+            }
+            e.Handled = true;
+        }
+
         private void btnDelimiter_Click(object sender, EventArgs e)
         {
-            OnCommandInvoked(_DecimalSeparator);
+            OnCommandInvoked(DecimalSeparator);
         }
 
         private void btn0_Click(object sender, EventArgs e)
         {
-            OnCommandInvoked(_0);
+            OnCommandInvoked(A0);
         }
 
         private void btn1_Click(object sender, EventArgs e)
         {
-            OnCommandInvoked(_1);
+            OnCommandInvoked(A1);
         }
 
         private void btn2_Click(object sender, EventArgs e)
         {
-            OnCommandInvoked(_2);
+            OnCommandInvoked(A2);
         }
 
         private void btn3_Click(object sender, EventArgs e)
         {
-            OnCommandInvoked(_3);
+            OnCommandInvoked(A3);
         }
 
         private void btn4_Click(object sender, EventArgs e)
         {
-            OnCommandInvoked(_4);
+            OnCommandInvoked(A4);
         }
 
         private void btn5_Click(object sender, EventArgs e)
         {
-            OnCommandInvoked(_5);
+            OnCommandInvoked(A5);
         }
 
         private void btn6_Click(object sender, EventArgs e)
         {
-            OnCommandInvoked(_6);
+            OnCommandInvoked(A6);
         }
 
         private void btn7_Click(object sender, EventArgs e)
         {
-            OnCommandInvoked(_7);
+            OnCommandInvoked(A7);
         }
 
         private void btn8_Click(object sender, EventArgs e)
         {
-            OnCommandInvoked(_8);
+            OnCommandInvoked(A8);
         }
 
         private void btn9_Click(object sender, EventArgs e)
         {
-            OnCommandInvoked(_9);
+            OnCommandInvoked(A9);
         }
 
         private void btnAdd_Click(object sender, EventArgs e)
@@ -113,7 +147,17 @@ namespace CalculatorApp.Views
             OnClearLastCommandInvoked();
         }
 
-        private void txtHistory_TextChanged(object sender, EventArgs e)
+        private void btnMemory_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnGroup_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void txtBox_TextChanged(object sender, EventArgs e)
         {
             if (sender is TextBox txtBox)
             {
@@ -159,51 +203,16 @@ namespace CalculatorApp.Views
             ClearLastCommandInvoked?.Invoke(this, new EventArgs());
         }
 
-        public void UpdateResults(string results)
-        {
-            _state.ButtonEnabled = true;
-            _state.Results = results;
-        }
-
-        public void UpdateHistory(string history)
-        {
-            _state.History = history;
-        }
-
-        public void UpdateError(string errorMessage)
-        {
-            _state.ButtonEnabled = false;
-            _state.Results = errorMessage;
-        }
+        public MainViewState ViewState => _state;
 
         #endregion
 
-        private void MainForm_Load(object sender, EventArgs e)
+        private void LoadPrivateFonts()
         {
-            KeyPreview = true;
-        }
+            _privateFontCollection.AddFontFile(Path.Combine(Application.StartupPath, "Resources", @"RobotoMono-VariableFont_wght.ttf"));
 
-        private void MainForm_KeyDown(object sender, KeyEventArgs e)
-        {
-            switch (e.KeyCode)
-            {
-                case Keys.Escape:
-                    btnCE.Select();
-                    btnCE.PerformClick();
-                    break;
-                case Keys.D0:
-                case Keys.NumPad0:
-                    btn0.Select();
-                    btn0.PerformClick();
-                    break;
-                case Keys.D1:
-                    btn1.Select();
-                    btn1.PerformClick();
-                    break;
-                default:
-                    break;
-            }
-            e.Handled = true;
+            Font = new Font(_privateFontCollection.Families[0], 12F, FontStyle.Regular);
+            txtHistory.Font = new Font(_privateFontCollection.Families[0], 10F, FontStyle.Regular);
         }
     }
 }

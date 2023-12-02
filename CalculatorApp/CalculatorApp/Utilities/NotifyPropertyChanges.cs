@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace CalculatorApp.Models
+namespace CalculatorApp.Utilities
 {
     internal class NotifyPropertyChanges : INotifyPropertyChanging, INotifyPropertyChanged
     {

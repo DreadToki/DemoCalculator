@@ -5,6 +5,8 @@ namespace CalculatorApp.Commands
 {
     internal class DivideCommand : ICommand
     {
+        public sbyte Weight => 2;
+
         public decimal Execute(decimal arg1, decimal arg2)
         {
             if (arg2 == 0)

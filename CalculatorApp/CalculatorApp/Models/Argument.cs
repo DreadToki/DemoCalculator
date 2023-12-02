@@ -3,42 +3,29 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 
 namespace CalculatorApp.Models
 {
     internal class Argument : IBufferItem
     {
-        private readonly LinkedList<char> _value;
+        private readonly List<char> _buffer;
 
-        public Argument(params char[] value)
+        public Argument(params char[] digits)
         {
-            _value = new LinkedList<char>();
+            _buffer = new List<char>();
 
-            if (value != null)
+            if (digits != null)
             {
-                foreach (char c in value)
+                foreach (char d in digits)
                 {
-                    _value.AddLast(c);
+                    _buffer.Add(d);
                 }
             }
         }
 
         public override string ToString()
         {
-            StringBuilder buffer = new StringBuilder();
-            ConcatNodes(buffer, _value.First);
-            return buffer.ToString();
-        }
-
-        private void ConcatNodes(StringBuilder buffer, LinkedListNode<char> node)
-        {
-            if (node == null)
-            {
-                return;
-            }
-            buffer.Append(node.Value);
-            ConcatNodes(buffer, node.Next);
+            return string.Join(string.Empty, _buffer);
         }
 
         public decimal ToDecimal()
@@ -53,35 +40,28 @@ namespace CalculatorApp.Models
 
         public void Append(Argument argument)
         {
-            if (argument._value.Count == 0)
+            foreach (var d in argument._buffer)
             {
-                throw new ArgumentException("Argument is empty.");
-            }
-            if (argument._value.Count == 1)
-            {
-                _value.AddLast(argument);
-            }
-            else
-            {
-                var chars = argument._value.ToArray();
-                for (int i = 0; i < chars.Length; i++)
-                {
-                    _value.AddLast(chars[i]);
-                }
+                _buffer.Add(d);
             }
         }
 
         public void RemoveLast()
         {
-            if (_value.Count > 0)
+            if (_buffer.Count > 0)
             {
-                _value.RemoveLast();
+                _buffer.RemoveAt(_buffer.Count - 1);
             }
         }
 
-        public bool IsEmpty => _value.Count == 0;
+        public bool IsEmpty => _buffer.Count == 0;
 
         public static implicit operator Argument(char value)
+        {
+            return new Argument(value);
+        }
+
+        public static implicit operator Argument(char[] value)
         {
             return new Argument(value);
         }
@@ -93,17 +73,21 @@ namespace CalculatorApp.Models
 
         public static implicit operator Argument(decimal value)
         {
-            Argument arg = value.ToString();
-            return arg;
+            return new Argument(value.ToString().ToCharArray());
         }
 
         public static implicit operator char(Argument argument)
         {
-            if (argument._value.Last == null)
+            if (argument._buffer.Count == 1)
             {
-                throw new ArgumentNullException("value");
+                return argument._buffer.Last();
             }
-            return argument._value.Last.Value;
+            throw new ArgumentException("Only single-digit arguments can be converted to char.");
+        }
+
+        public static implicit operator char[](Argument argument)
+        {
+            return argument._buffer.ToArray();
         }
 
         public static implicit operator string(Argument argument)
@@ -116,16 +100,16 @@ namespace CalculatorApp.Models
             return argument.ToDecimal();
         }
 
-        public static Argument _0 => '0';
-        public static Argument _1 => '1';
-        public static Argument _2 => '2';
-        public static Argument _3 => '3';
-        public static Argument _4 => '4';
-        public static Argument _5 => '5';
-        public static Argument _6 => '6';
-        public static Argument _7 => '7';
-        public static Argument _8 => '8';
-        public static Argument _9 => '9';
-        public static Argument _DecimalSeparator => NumberFormatInfo.CurrentInfo.NumberDecimalSeparator;
+        public static Argument A0 => '0';
+        public static Argument A1 => '1';
+        public static Argument A2 => '2';
+        public static Argument A3 => '3';
+        public static Argument A4 => '4';
+        public static Argument A5 => '5';
+        public static Argument A6 => '6';
+        public static Argument A7 => '7';
+        public static Argument A8 => '8';
+        public static Argument A9 => '9';
+        public static Argument DecimalSeparator => NumberFormatInfo.CurrentInfo.NumberDecimalSeparator;
     }
 }

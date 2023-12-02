@@ -1,17 +1,14 @@
-﻿using CalculatorApp.Models;
+﻿using CalculatorApp.Utilities;
 using System.ComponentModel;
 
 namespace CalculatorApp.Views
 {
-    internal class MainFormState : NotifyPropertyChanges
+    internal class MainViewState : NotifyPropertyChanges
     {
         private bool _buttonEnabled = true;
+        private bool _hasErrors;
         private string _results;
         private string _history;
-
-        public MainFormState()
-        {
-        }
 
         [Bindable(true)]
         public bool ButtonEnabled
@@ -56,6 +53,21 @@ namespace CalculatorApp.Views
                     OnPropertyChanged();
                 }
             }
+        }
+
+        public bool HasErrors
+        {
+            get => _hasErrors;
+            set
+            {
+                _hasErrors = value;
+                UpdateState(value);
+            }
+        }
+
+        private void UpdateState(bool hasErrors)
+        {
+            ButtonEnabled = !hasErrors;
         }
     }
 }

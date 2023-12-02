@@ -1,17 +1,15 @@
-﻿using CalculatorApp.Models;
+﻿using CalculatorApp.Views;
 using System;
 
 namespace CalculatorApp.Interface
 {
-    internal interface ICalculatorView
+    internal interface IMainView
     {
         event EventHandler<CommandInvokedEventArgs> CommandInvoked;
         event EventHandler EqualsCommandInvoked;
         event EventHandler ClearEverythingCommandInvoked;
         event EventHandler ClearLastCommandInvoked;
 
-        void UpdateResults(string results);
-        void UpdateHistory(string history);
-        void UpdateError(string errorMessage);
+        MainViewState ViewState { get; }
     }
 }

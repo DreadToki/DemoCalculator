@@ -59,25 +59,5 @@ namespace CalculatorApp.Properties {
                 resourceCulture = value;
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] FragmentMono_Italic {
-            get {
-                object obj = ResourceManager.GetObject("FragmentMono_Italic", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] FragmentMono_Regular {
-            get {
-                object obj = ResourceManager.GetObject("FragmentMono_Regular", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
     }
 }

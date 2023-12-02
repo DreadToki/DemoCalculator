@@ -1,7 +1,7 @@
 ﻿using CalculatorApp.Interface;
 using System;
 
-namespace CalculatorApp.Models
+namespace CalculatorApp.Views
 {
     internal class CommandInvokedEventArgs : EventArgs
     {

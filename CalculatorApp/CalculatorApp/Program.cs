@@ -1,5 +1,4 @@
-﻿using CalculatorApp.Models;
-using CalculatorApp.Presenter;
+﻿using CalculatorApp.Presenter;
 using CalculatorApp.Views;
 using System;
 using System.Windows.Forms;
@@ -12,16 +11,13 @@ namespace CalculatorApp
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        static int Main()
+        static void Main()
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            var model = new CalculatorModel();
             var view = new MainForm();
-            var presenter = new CalculatorPresenter(view, model);
+            new Calculator(view, new Models.Buffer());
             Application.Run(view);
-
-            return 0;
         }
     }
 }
