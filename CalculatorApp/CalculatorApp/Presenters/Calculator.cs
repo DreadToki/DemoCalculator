@@ -79,20 +79,12 @@ namespace CalculatorApp.Presenter
             try
             {
                 var buffer = _model.ToList();
-                var lastResultIndex = buffer.IndexOf(buffer.Last(e => e is Result));
+                var lastResultIndex = buffer.Any(i => i is Result) ? buffer.IndexOf(buffer.Last(i => i is Result)) : -1;
                 var calculationSeq = buffer.Skip(lastResultIndex + 1).ToList();
-                var finalResult = RecurseCalculate(calculationSeq);
-                _model.AddResult(finalResult);
-                _model.AddArgument(finalResult);
 
-                //if (_model.ElementAt(_model.Count - 1) is Argument arg2 &&
-                //    _model.ElementAt(_model.Count - 2) is ICommand command &&
-                //    _model.ElementAt(_model.Count - 3) is Argument arg1)
-                //{
-                //    Result result = command.Execute(arg1, arg2);
-                //    _model.AddResult(result);
-                //    _model.AddArgument(result);
-                //}
+                var result = RecurseCalculate(calculationSeq);
+                _model.AddResult(result);
+                _model.AddArgument(result);
             }
             catch (Exception ex)
             {
@@ -111,15 +103,21 @@ namespace CalculatorApp.Presenter
             var arg1Index = commandIndex - 1;
             var arg2Index = commandIndex + 1;
 
-            Argument result = command.Execute(calculationSeq[arg1Index] as Argument, calculationSeq[arg2Index] as Argument);
-
-            calculationSeq.Insert(arg2Index + 1, result);
-            calculationSeq.RemoveRange(arg1Index, 3);
-            if (calculationSeq.Count == 1 && calculationSeq[0] is Argument finalResult)
+            if (calculationSeq[arg1Index] is Argument arg1 && calculationSeq[arg2Index] is Argument arg2)
             {
-                return finalResult;
+                Argument result = command.Execute(arg1, arg2);
+                calculationSeq.Insert(arg2Index + 1, result);
+                calculationSeq.RemoveRange(arg1Index, 3);
+                if (calculationSeq.Count == 1 && calculationSeq.First() is Argument finalResult)
+                {
+                    return finalResult;
+                }
+                return RecurseCalculate(calculationSeq);
             }
-            return RecurseCalculate(calculationSeq);
+            else
+            {
+                throw new ArgumentException("Incorrect calculation sequence.");
+            }
         }
 
         private void UpdateView()

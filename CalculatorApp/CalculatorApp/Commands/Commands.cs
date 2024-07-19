@@ -9,5 +9,9 @@
         public static MultiplyCommand MultiplyCommand => new MultiplyCommand();
 
         public static DivideCommand DivideCommand => new DivideCommand();
+
+        public static PowerCommand PowerCommand => new PowerCommand();
+
+        public static RootCommand RootCommand => new RootCommand();
     }
 }

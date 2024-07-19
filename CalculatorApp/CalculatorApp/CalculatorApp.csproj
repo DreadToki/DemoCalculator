@@ -64,6 +64,8 @@
   <ItemGroup>
     <Compile Include="Commands\AddCommand.cs" />
     <Compile Include="Commands\Commands.cs" />
+    <Compile Include="Commands\PowerCommand.cs" />
+    <Compile Include="Commands\RootCommand.cs" />
     <Compile Include="Interface\IBufferItem.cs" />
     <Compile Include="Interface\IBuffer.cs" />
     <Compile Include="Models\Error.cs" />

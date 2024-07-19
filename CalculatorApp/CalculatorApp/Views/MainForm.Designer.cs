@@ -459,8 +459,9 @@
             this.btnRoot.Name = "btnRoot";
             this.btnRoot.Size = new System.Drawing.Size(72, 48);
             this.btnRoot.TabIndex = 20;
-            this.btnRoot.Text = "ⁿ√";
+            this.btnRoot.Text = "ⁿ√x";
             this.btnRoot.UseVisualStyleBackColor = true;
+            this.btnRoot.Click += new System.EventHandler(this.btnRoot_Click);
             // 
             // btnPower
             // 
@@ -471,8 +472,9 @@
             this.btnPower.Name = "btnPower";
             this.btnPower.Size = new System.Drawing.Size(72, 48);
             this.btnPower.TabIndex = 19;
-            this.btnPower.Text = "Xⁿ";
+            this.btnPower.Text = "xⁿ";
             this.btnPower.UseVisualStyleBackColor = true;
+            this.btnPower.Click += new System.EventHandler(this.btnPower_Click);
             // 
             // txtHistory
             // 

@@ -36,6 +36,7 @@ namespace CalculatorApp.Views
 
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
         {
+            //TODO: KeyCode defines only one key press, not the combination
             switch (e.KeyCode)
             {
                 case Keys.Escape:
@@ -137,6 +138,16 @@ namespace CalculatorApp.Views
             OnEqualsCommandInvoked();
         }
 
+        private void btnPower_Click(object sender, EventArgs e)
+        {
+            OnCommandInvoked(PowerCommand);
+        }
+
+        private void btnRoot_Click(object sender, EventArgs e)
+        {
+            OnCommandInvoked(RootCommand);
+        }
+
         private void btnCE_Click(object sender, EventArgs e)
         {
             OnClearEverythingCommandInvoked();
@@ -149,12 +160,12 @@ namespace CalculatorApp.Views
 
         private void btnMemory_Click(object sender, EventArgs e)
         {
-
+            //TODO: Implement MemoryUp case
         }
 
         private void btnGroup_Click(object sender, EventArgs e)
         {
-
+            //TODO: Implement group case
         }
 
         private void txtBox_TextChanged(object sender, EventArgs e)
